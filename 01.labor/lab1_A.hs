@@ -167,7 +167,7 @@ tf2 n =[mod i 2 == 0 | i <- [0 ..n]]
 
 
 {-
-**Megoldott feladatok:**
+Megoldott feladatok:
 
 - Határozzuk meg egy szám osztóinak listáját:
 
