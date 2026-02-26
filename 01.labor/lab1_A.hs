@@ -153,6 +153,8 @@ betuSzam = zip ['a' .. 'z'][0 .. 25]
 
 betuSzam2 = zip ['a' .. 'z'][1,3 .. ]
 
+
+
 -- a következő listát: $$[(0, 5), (1, 4), (2, 3), (3, 2), (4, 1), (5, 0)]$$, majd általánosítsuk a feladatot.
 szamok = zip [0 .. 5][5,4 .. 0]
 szamok2 n = zip [0 .. 5][n,n-1 .. 0]
