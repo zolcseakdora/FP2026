@@ -1,0 +1,5 @@
+Varos {vNev = "Kolozsvar", vNepSzam = 324576, vTerMeret = 179}
+Varos {vNev = "Marosvasarhely", vNepSzam = 134290, vTerMeret = 67}
+Varos {vNev = "Sepsiszentgyorgy", vNepSzam = 56006, vTerMeret = 72}
+Varos {vNev = "Csikszereda", vNepSzam = 38966, vTerMeret = 34}
+Varos {vNev = "Brassov", vNepSzam = 253200, vTerMeret = 267}

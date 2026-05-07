@@ -137,3 +137,27 @@ Elofordulas: 1 -> Ertek: 3
 Elofordulas: 1 -> Ertek: 7
 Elofordulas: 3 -> Ertek: 4
 Elofordulas: 5 -> Ertek: 2-}
+findOddOccurrences xs = do
+    let
+        groups = group (sort xs)
+        counts = [(length g, head g) | g <- groups]
+        oddCounts = filter (\(db, _) -> odd db) counts
+        sortedResults = sortOn fst oddCounts
+
+    if null sortedResults
+        then putStrLn "Nincs paratlan elofordulasi ertekkel rendelkezo szam."
+        else mapM_ (\(db, val) -> putStrLn $ "Elofordulas: " ++ show db ++ " -> Ertek: " ++ show val) sortedResults
+
+main :: IO ()
+main = do
+    putStrLn "Teszt 1: [7] "
+    findOddOccurrences [7]
+    
+    putStrLn "\nTeszt 2: [1, 1, 2]"
+    findOddOccurrences [1, 1, 2]
+    
+    putStrLn "\nTeszt 3: [1, 1]"
+    findOddOccurrences [1, 1]
+    
+    putStrLn "\nTeszt 4: összetett lista"
+    findOddOccurrences [1, 1, 2, 3, 4, 2, 6, 2, 4, 4, 2, 6, 7, 6, 6, 2]
