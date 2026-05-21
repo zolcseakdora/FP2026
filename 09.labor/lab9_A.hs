@@ -94,3 +94,79 @@ data Szemely = Szemely {
   knev :: [Char],
   szdatum :: Datum
 } deriving (Show)
+
+type NevnapRecord = (String, String)
+
+-- Zeller-féle kongruencia a hét napjának kiszámítására
+milyenNap :: Datum -> String
+milyenNap (Datum d m y) =
+    let y' = if m < 3 then y - 1 else y
+        m' = if m < 3 then m + 12 else m
+        k = y' `mod` 100
+        j = y' `div` 100
+        h = (d + ((13 * (m' + 1)) `div` 5) + k + (k `div` 4) + (j `div` 4) - (2 * j)) `mod` 7
+        napok = ["Szombat", "Vasárnap", "Hétfő", "Kedd", "Szerda", "Csütörtök", "Péntek"]
+    in napok !! h
+
+-- Személyek beolvasása (Feltételezett formátum: Vezetéknév Keresztnév Év Hónap Nap)
+parseSzemely :: String -> Szemely
+parseSzemely line =
+    let parts = words line
+        v = parts !! 0
+        k = parts !! 1
+        y = read (parts !! 2) :: Int
+        m = read (parts !! 3) :: Int
+        d = read (parts !! 4) :: Int
+    in Szemely v k (Datum d m y)
+
+-- Névnapok beolvasása a te fájlod struktúrája alapján
+parseNevnap :: String -> NevnapRecord
+parseNevnap line =
+    let -- A név az első szóközig, zárójelig vagy kettőspontig tart
+        nev = takeWhile (\c -> c `notElem` " (:\t") line
+        
+        -- Megkeressük a zárójelet
+        maradek = dropWhile (/= '(') line
+        
+        -- Ha van zárójel, kivesszük a tartalmát, különben "Nincs megadva dátum" lesz
+        datum = if null maradek 
+                then "Nincs megadva dátum a fájlban" 
+                else takeWhile (/= ')') (tail maradek)
+    in (nev, datum)
+
+-- Segédfüggvény: kiszűri a felesleges sorokat (pl. üres sorok, vagy csak egy "A " betű)
+isValidNevnapLine :: String -> Bool
+isValidNevnapLine line = length line > 2 && any (`elem` ['a'..'z']) line
+
+-- Keresés a névnapok listájában
+keresNevnap :: String -> [NevnapRecord] -> String
+keresNevnap keresettNev nevnapok =
+    case filter (\(n, _) -> n == keresettNev) nevnapok of
+        [] -> "Nem található adat a fájlban"
+        ((_, d):_) -> d
+
+-- Főprogram
+main :: IO ()
+main = do
+    -- 1. Személyek beolvasása
+    szemelyekStr <- readFile "szemelyek.txt"
+    -- Kiszűrjük az üres sorokat a személyeknél is a biztonság kedvéért
+    let szemelyekLines = filter (\l -> length l > 5) (lines szemelyekStr)
+    let szemelyek = map parseSzemely szemelyekLines
+
+    -- 2. Névnapok beolvasása
+    nevnapokStr <- readFile "nevnapok.txt"
+    -- Kiszűrjük a hibás/üres sorokat, majd feldolgozzuk
+    let nevnapLines = filter isValidNevnapLine (lines nevnapokStr)
+    let nevnapok = map parseNevnap nevnapLines
+
+    -- 3. Eredmények kiírása
+    mapM_ (\sz -> do
+        let hetNapja = milyenNap (szdatum sz)
+            nnap = keresNevnap (knev sz) nevnapok
+        
+        putStrLn $ vnev sz ++ " " ++ knev sz ++ ":"
+        putStrLn $ "  - Született: " ++ hetNapja
+        putStrLn $ "  - Névnapja(i): " ++ nnap
+        putStrLn "-----------------------------------"
+        ) szemelyek
